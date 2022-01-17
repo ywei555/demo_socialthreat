@@ -78,6 +78,16 @@
     };
     timeline.push(instructions);
 
+    var instructions2 = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <p>This is just a demo. There will be a total of 10 trials. </p>
+        <p>To repeat, press F if there is threat, press J if not</p>
+      `,
+      post_trial_gap: 500
+    };
+    timeline.push(instructions2);
+
     /* define trial stimuli array for timeline variables */
     var test_stimuli = [
       { stimulus: img1[0], correct_response: 'f'},
