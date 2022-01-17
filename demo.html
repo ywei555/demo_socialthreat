@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My experiment</title>
+    <script src="https://unpkg.com/jspsych@7.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response@1.1.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.0"></script>
+    <link href="https://unpkg.com/jspsych@7.1.2/css/jspsych.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body></body>
+  <script>
+
+  /* initialize jsPsych */
+      var jsPsych = initJsPsych({
+        on_finish: function() {
+          jsPsych.data.displayData();
+        }
+      });
+
+    /* create timeline */
+    var timeline = [];
+    var img1 = ['social_threat/1.jpeg', 'social_threat/2.jpeg','social_threat/3.jpeg','social_threat/4.jpeg','social_threat/5.jpeg'];
+    var img2 = ['social_nonthreat/1.jpeg', 'social_nonthreat/2.jpeg', 'social_nonthreat/3.jpeg', 'social_nonthreat/4.jpeg', 'social_nonthreat/5.jpeg'];
+
+    /* preload images */
+    var preload = {
+      type: jsPsychPreload,
+      images: [img1, img2]
+    }
+    timeline.push(preload);
+
+    /* define welcome message trial */
+    var welcome = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: "Welcome to the experiment. Press any key to begin."
+    };
+    timeline.push(welcome);
+
+    /* define instructions trial */
+    var instructions = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <p>In this experiment, a picture will appear in the center
+        of the screen.</p><p>If the picture shows <strong>threat</strong> context (e.g. social isolation),
+        press the letter F on the keyboard as fast as you can.</p>
+        <p>If the picture shows <strong>safe</strong> context, press the letter J
+        as fast as you can.</p>
+        <div style='width: 700px;'>
+        <div style='float: left;'><img src='social_threat/1.jpeg'></img>
+        <p class='small'><strong>Press the F key</strong></p></div>
+        <div style='float: right;'><img src='social_nonthreat/1.jpeg'></img>
+        <p class='small'><strong>Press the J key</strong></p></div>
+        </div>
+        <p>Press any key to begin.</p>
+      `,
+      post_trial_gap: 500
+    };
+    timeline.push(instructions);
+
+    /* define trial stimuli array for timeline variables */
+    var test_stimuli = [
+      { stimulus: img1[0], correct_response: 'f'},
+      { stimulus: img1[1], correct_response: 'f'},
+      { stimulus: img1[2], correct_response: 'f'},
+      { stimulus: img1[3], correct_response: 'f'},
+      { stimulus: img1[4], correct_response: 'f'},
+      { stimulus: img2[0], correct_response: 'j'},
+      { stimulus: img2[1], correct_response: 'j'},
+      { stimulus: img2[2], correct_response: 'j'},
+      { stimulus: img2[3], correct_response: 'j'},
+      { stimulus: img2[4], correct_response: 'j'}
+    ];
+
+    /* define fixation and test trials */
+    var fixation = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<div style="font-size:60px;">+</div>',
+      choices: "NO_KEYS",
+      trial_duration: function(){
+        return jsPsych.randomization.sampleWithoutReplacement([500], 1)[0];
+      },
+      data: {
+        task: 'fixation'
+      }
+    };
+    // var ii = 0;
+    // var rid = 0;
+    // var allchoice = ['f', 'j'];
+    var test = {
+      type: jsPsychImageKeyboardResponse,
+      stimulus: jsPsych.timelineVariable('stimulus'),
+      // jsPsych.randomization.sampleWithoutReplacement([0.001, 0.002, 0.003], 1)[0];
+      choices: ['f', 'j'],
+      data: {
+        task: 'response',
+        correct_response: jsPsych.timelineVariable('correct_response')
+      },
+      on_finish: function(data){
+        data.correct = jsPsych.pluginAPI.compareKeys(data.response, data.correct_response);
+      }
+    };
+
+    /* define test procedure */
+    var test_procedure = {
+      timeline: [fixation, test],
+      timeline_variables: test_stimuli,
+      // on_timeline_start:function(){
+      //   ii++;
+      //   console.log('Repetition number ',ii,' has just started.');
+      // },
+      randomize_order: true,
+      repetitions: 1
+    };
+    timeline.push(test_procedure);
+
+    /* define debrief */
+    var debrief_block = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function() {
+
+        var trials = jsPsych.data.get().filter({task: 'response'});
+        var correct_trials = trials.filter({correct: true});
+        var t_trials = trials.filter({correct_response: 'f'});
+        var nt_trials = trials.filter({correct_response: 'j'});
+        var accuracy = Math.round(correct_trials.count() / trials.count() * 100);
+        var rt_t = Math.round(t_trials.select('rt').mean());
+        var rt_nt = Math.round(nt_trials.select('rt').mean());
+
+        return `<p>You responded correctly on ${accuracy}% of the trials.</p>
+          <p>Your average response time for threat images was ${rt_t}ms.</p>
+          <p>Your average response time for non-threat images was ${rt_nt}ms.</p>
+          <p>Press Q to complete the experiment. Thank you!</p>`;
+
+      }
+    };
+    timeline.push(debrief_block);
+
+    /* start the experiment */
+    jsPsych.run(timeline);
+
+  </script>
+</html>
