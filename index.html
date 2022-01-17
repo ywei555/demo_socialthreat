@@ -15,8 +15,9 @@
 
   /* initialize jsPsych */
       var jsPsych = initJsPsych({
+        show_progress_bar: true,
         on_finish: function() {
-          jsPsych.data.displayData();
+          // jsPsych.data.displayData();
         }
       });
 
@@ -161,7 +162,7 @@
         return `<p>You responded correctly on ${accuracy}% of the trials.</p>
           <p>Your average response time for threat images was ${rt_t}ms.</p>
           <p>Your average response time for non-threat images was ${rt_nt}ms.</p>
-          <p>Press Q to end. Raw data is displayed in the next page!</p>`;
+          <p>Press Q to end. Raw data will be displayed in the next page!</p>`;
 
       }
     };
