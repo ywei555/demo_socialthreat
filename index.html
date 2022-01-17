@@ -20,6 +20,24 @@
 
     /* create timeline */
     var timeline = [];
+    timeline.push({
+      type: 'fullscreen',
+      fullscreen_mode: true
+    });
+
+    var survey_trial = {
+      type: 'survey-text',
+      questions: [
+        {prompt: "Name: ", name: 'name'},
+      ],
+      on_finish: function(data){
+          var temp = JSON.parse(data.responses);
+          data.subname = temp.name;
+      }
+    };
+    timeline.push(survey_trial)
+
+
     var img1 = ['social_threat/1.jpeg', 'social_threat/2.jpeg','social_threat/3.jpeg','social_threat/4.jpeg','social_threat/5.jpeg'];
     var img2 = ['social_nonthreat/1.jpeg', 'social_nonthreat/2.jpeg', 'social_nonthreat/3.jpeg', 'social_nonthreat/4.jpeg', 'social_nonthreat/5.jpeg'];
 
@@ -130,11 +148,15 @@
         return `<p>You responded correctly on ${accuracy}% of the trials.</p>
           <p>Your average response time for threat images was ${rt_t}ms.</p>
           <p>Your average response time for non-threat images was ${rt_nt}ms.</p>
-          <p>Press Q to complete the experiment. Thank you!</p>`;
+          <p>Press Q to end. Raw data is displayed in the next page!</p>`;
 
       }
     };
     timeline.push(debrief_block);
+    timeline.push({
+      type: 'fullscreen',
+      fullscreen_mode: false
+    });
 
     /* start the experiment */
     jsPsych.run(timeline);
