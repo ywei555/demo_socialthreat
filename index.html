@@ -3,6 +3,8 @@
   <head>
     <title>My experiment</title>
     <script src="https://unpkg.com/jspsych@7.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.1.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response@1.1.0"></script>
     <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.0"></script>
@@ -21,19 +23,19 @@
     /* create timeline */
     var timeline = [];
     timeline.push({
-      type: 'fullscreen',
+      type: jsPsychFullscreen,
       fullscreen_mode: true
     });
 
     var survey_trial = {
-      type: 'survey-text',
+      type: jsPsychSurveyText,
       questions: [
         {prompt: "Name: ", name: 'name'},
       ],
-      on_finish: function(data){
-          var temp = JSON.parse(data.responses);
-          data.subname = temp.name;
-      }
+      // on_finish: function(data){
+      //     var temp = JSON.parse(data.responses);
+      //     data.subname = temp.name;
+      // }
     };
     timeline.push(survey_trial)
 
@@ -154,7 +156,7 @@
     };
     timeline.push(debrief_block);
     timeline.push({
-      type: 'fullscreen',
+      type: jsPsychFullscreen,
       fullscreen_mode: false
     });
 
